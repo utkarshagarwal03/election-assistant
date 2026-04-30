@@ -40,35 +40,33 @@ export default function ChatAssistant() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:3001/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: [...messages, userMessage] })
-      });
-
-      if (!response.ok) throw new Error('Network response was not ok');
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-      let done = false;
+      const lastMessage = input.toLowerCase();
+      let mockReply = "I am a simulated ECI assistant. According to ECI guidelines, ";
+      
+      if (lastMessage.includes("register") || lastMessage.includes("enroll")) {
+        mockReply += "you need to fill out Form 6 to register as a new voter. You can do this online on the NVSP portal or at your local Electoral Registration Office. Make sure you are 18 years or older as of January 1st.";
+      } else if (lastMessage.includes("id") || lastMessage.includes("epic") || lastMessage.includes("document")) {
+        mockReply += "you must carry your EPIC (Voter ID). If you don't have an EPIC, you can use an approved photo ID like an Aadhaar card, PAN card, Driving License, or Passport to the polling booth to cast your vote.";
+      } else if (lastMessage.includes("evm") || lastMessage.includes("vote")) {
+        mockReply += "voting is done through Electronic Voting Machines (EVMs). Press the blue button next to your candidate's name. Wait for the beep sound to confirm your vote has been recorded, and you can verify your choice on the VVPAT slip printed alongside it.";
+      } else if (lastMessage.includes("date") || lastMessage.includes("when")) {
+        mockReply += "election dates differ by state and constituency. Please check the official ECI website for the schedule relevant to your state assembly or parliamentary constituency.";
+      } else {
+        mockReply += "please refer to the official Election Commission of India website (eci.gov.in) or call the toll-free voter helpline at 1950 for accurate guidance regarding your query.";
+      }
 
       let assistantMessageContent = '';
       setMessages(prev => [...prev, { id: 'temp', role: 'assistant', content: '' }]);
 
-      if (reader) {
-        while (!done) {
-          const { value, done: readerDone } = await reader.read();
-          done = readerDone;
-          if (value) {
-            assistantMessageContent += decoder.decode(value, { stream: true });
-            
-            // Just update the latest message in state to simulate streaming
-            setMessages(prev => {
-              const updated = [...prev];
-              updated[updated.length - 1] = { id: Date.now().toString(), role: 'assistant', content: assistantMessageContent };
-              return updated;
-            });
-          }
-        }
+      const words = mockReply.split(' ');
+      for (let i = 0; i < words.length; i++) {
+          assistantMessageContent += words[i] + ' ';
+          setMessages(prev => {
+            const updated = [...prev];
+            updated[updated.length - 1] = { id: Date.now().toString(), role: 'assistant', content: assistantMessageContent };
+            return updated;
+          });
+          await new Promise(resolve => setTimeout(resolve, 80)); // Typewriter delay
       }
     } catch (error) {
       console.error(error);
