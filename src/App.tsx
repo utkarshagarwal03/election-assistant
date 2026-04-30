@@ -132,6 +132,7 @@ function App() {
         <a href="#game">Minigame</a>
       </nav>
 
+      <main>
       <div id="timeline" className="timeline-container">
         {timelineData.map((phase, index) => (
           <div 
@@ -284,6 +285,7 @@ function App() {
       <div id="game" className="nav-section">
         <BallotGame />
       </div>
+      </main>
 
       {/* Embedded ECI AI Assistant */}
       <ChatAssistant />

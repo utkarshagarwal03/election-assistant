@@ -61,12 +61,7 @@ export default function BallotGame() {
   const handleMouseMove = useCallback((e: MouseEvent | TouchEvent) => {
     if (!isPlaying || !gameAreaRef.current) return;
     
-    let clientX = 0;
-    if ('touches' in e) {
-      clientX = e.touches[0].clientX;
-    } else {
-      clientX = (e as MouseEvent).clientX;
-    }
+    const clientX = 'touches' in e ? e.touches[0].clientX : (e as MouseEvent).clientX;
 
     const rect = gameAreaRef.current.getBoundingClientRect();
     let x = ((clientX - rect.left) / rect.width) * 100;
@@ -187,7 +182,7 @@ export default function BallotGame() {
 
   // Hack wrapper to let RAF read latest box pos cleanly
   useEffect(() => {
-    (window as any).boxPosRef = boxPosition;
+    window.boxPosRef = boxPosition;
   }, [boxPosition]);
 
   // Removed setState in effect
