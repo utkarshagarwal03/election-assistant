@@ -40,33 +40,57 @@ export default function ChatAssistant() {
     setIsLoading(true);
 
     try {
-      const lastMessage = input.toLowerCase();
-      let mockReply = "I am a simulated ECI assistant. According to ECI guidelines, ";
+      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
       
-      if (lastMessage.includes("register") || lastMessage.includes("enroll")) {
-        mockReply += "you need to fill out Form 6 to register as a new voter. You can do this online on the NVSP portal or at your local Electoral Registration Office. Make sure you are 18 years or older as of January 1st.";
-      } else if (lastMessage.includes("id") || lastMessage.includes("epic") || lastMessage.includes("document")) {
-        mockReply += "you must carry your EPIC (Voter ID). If you don't have an EPIC, you can use an approved photo ID like an Aadhaar card, PAN card, Driving License, or Passport to the polling booth to cast your vote.";
-      } else if (lastMessage.includes("evm") || lastMessage.includes("vote")) {
-        mockReply += "voting is done through Electronic Voting Machines (EVMs). Press the blue button next to your candidate's name. Wait for the beep sound to confirm your vote has been recorded, and you can verify your choice on the VVPAT slip printed alongside it.";
-      } else if (lastMessage.includes("date") || lastMessage.includes("when")) {
-        mockReply += "election dates differ by state and constituency. Please check the official ECI website for the schedule relevant to your state assembly or parliamentary constituency.";
-      } else {
-        mockReply += "please refer to the official Election Commission of India website (eci.gov.in) or call the toll-free voter helpline at 1950 for accurate guidance regarding your query.";
-      }
-
       let assistantMessageContent = '';
       setMessages(prev => [...prev, { id: 'temp', role: 'assistant', content: '' }]);
 
-      const words = mockReply.split(' ');
+      if (apiKey) {
+        // Real Google Services Integration (Gemini)
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: `You are the official digital assistant for the Election Commission of India (ECI). Answer based on ECI guidelines. User asks: ${input}` }] }]
+          })
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          assistantMessageContent = data.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, I couldn't generate a response.";
+        } else {
+          throw new Error('Gemini API Error');
+        }
+      } else {
+        // Fallback Mock Logic
+        const lastMessage = input.toLowerCase();
+        let mockReply = "I am a simulated ECI assistant. According to ECI guidelines, ";
+        
+        if (lastMessage.includes("register") || lastMessage.includes("enroll")) {
+          mockReply += "you need to fill out Form 6 to register as a new voter. You can do this online on the NVSP portal or at your local Electoral Registration Office. Make sure you are 18 years or older as of January 1st.";
+        } else if (lastMessage.includes("id") || lastMessage.includes("epic") || lastMessage.includes("document")) {
+          mockReply += "you must carry your EPIC (Voter ID). If you don't have an EPIC, you can use an approved photo ID like an Aadhaar card, PAN card, Driving License, or Passport to the polling booth to cast your vote.";
+        } else if (lastMessage.includes("evm") || lastMessage.includes("vote")) {
+          mockReply += "voting is done through Electronic Voting Machines (EVMs). Press the blue button next to your candidate's name. Wait for the beep sound to confirm your vote has been recorded, and you can verify your choice on the VVPAT slip printed alongside it.";
+        } else if (lastMessage.includes("date") || lastMessage.includes("when")) {
+          mockReply += "election dates differ by state and constituency. Please check the official ECI website for the schedule relevant to your state assembly or parliamentary constituency.";
+        } else {
+          mockReply += "please refer to the official Election Commission of India website (eci.gov.in) or call the toll-free voter helpline at 1950 for accurate guidance regarding your query.";
+        }
+        assistantMessageContent = mockReply;
+      }
+
+      // Simulate streaming effect
+      const words = assistantMessageContent.split(' ');
+      let currentText = '';
       for (let i = 0; i < words.length; i++) {
-          assistantMessageContent += words[i] + ' ';
+          currentText += words[i] + ' ';
           setMessages(prev => {
             const updated = [...prev];
-            updated[updated.length - 1] = { id: Date.now().toString(), role: 'assistant', content: assistantMessageContent };
+            updated[updated.length - 1] = { id: Date.now().toString(), role: 'assistant', content: currentText };
             return updated;
           });
-          await new Promise(resolve => setTimeout(resolve, 80)); // Typewriter delay
+          await new Promise(resolve => setTimeout(resolve, 50)); // Typewriter delay
       }
     } catch (error) {
       console.error(error);
@@ -78,6 +102,7 @@ export default function ChatAssistant() {
   return (
     <>
       <button 
+        aria-label="Toggle AI Chat Assistant"
         className="chat-toggle-btn"
         onClick={() => setIsOpen(true)}
       >
@@ -98,7 +123,7 @@ export default function ChatAssistant() {
                 <Bot size={20} className="text-accent-primary" />
                 <h3>ECI Assistant</h3>
               </div>
-              <button onClick={() => setIsOpen(false)} className="chat-close-btn">
+              <button aria-label="Close Chat" onClick={() => setIsOpen(false)} className="chat-close-btn">
                 <X size={20} />
               </button>
             </div>
@@ -136,7 +161,7 @@ export default function ChatAssistant() {
                 placeholder="Ask about your voting rights..."
                 className="chat-input"
               />
-              <button type="submit" disabled={!input.trim()} className="chat-send-btn">
+              <button aria-label="Send Message" type="submit" disabled={!input.trim()} className="chat-send-btn">
                 <Send size={18} />
               </button>
             </form>

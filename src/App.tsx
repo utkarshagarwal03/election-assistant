@@ -215,6 +215,7 @@ function App() {
           Complete a quick checklist to ensure you have everything needed for election day.
         </p>
         <button 
+          aria-label="Start Voter Readiness Checklist"
           className="btn-primary flex items-center justify-center mx-auto gap-2"
           onClick={() => setShowChecklist(true)}
         >
@@ -232,7 +233,7 @@ function App() {
             exit={{ opacity: 0, scale: 0.9 }}
             onClick={(e) => e.stopPropagation()}
           >
-            <button className="modal-close" onClick={() => setShowChecklist(false)}>×</button>
+            <button aria-label="Close Checklist" className="modal-close" onClick={() => setShowChecklist(false)}>×</button>
             <h2 className="modal-title">Voter Readiness Checklist</h2>
             <div className="checklist-items">
               {checklistItems.map(item => (

@@ -1,13 +1,27 @@
 {
   "name": "election-assistant",
+  "description": "An interactive web application to educate and engage citizens in the electoral process, featuring an AI ECI assistant, election simulator, and a minigame.",
+  "author": "Utkarsh Agarwal",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
+  "keywords": [
+    "react",
+    "vite",
+    "election",
+    "civic-tech",
+    "ai-assistant"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/utkarshagarwal03/election-assistant.git"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest run"
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.64",
@@ -21,6 +35,8 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/node": "^24.12.2",
@@ -34,9 +50,11 @@
     "eslint-plugin-react-refresh": "^0.5.2",
     "express": "^5.2.1",
     "globals": "^17.5.0",
+    "jsdom": "^29.1.1",
     "ts-node": "^10.9.2",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.58.2",
-    "vite": "^8.0.10"
+    "vite": "^8.0.10",
+    "vitest": "^4.1.5"
   }
 }

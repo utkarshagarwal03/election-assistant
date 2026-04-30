@@ -99,6 +99,7 @@ export default function BallotGame() {
         setTimeLeft(prev => {
           if (prev <= 1) {
             setIsGameOver(true);
+            setIsPlaying(false);
             return 0;
           }
           return prev - 1;
@@ -189,9 +190,7 @@ export default function BallotGame() {
     (window as any).boxPosRef = boxPosition;
   }, [boxPosition]);
 
-  useEffect(() => {
-    if (isGameOver) stopGame();
-  }, [isGameOver]);
+  // Removed setState in effect
 
   useEffect(() => {
     return () => stopGame();
